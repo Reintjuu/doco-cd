@@ -174,7 +174,7 @@ Printing an entry directly (`{{ . }}`) gives `shortHash subject`.
         {{ end }}
     ```
 
-Only commits that changed a file of the stack are listed, like `git log -- <paths>`. The paths are the ones the compose project resolves to: the compose files, `configs:`, `secrets:`, `env_file:`, bind mount sources and build contexts, plus the deploy config file (`.doco-cd.yml` or `.doco-cd.<target>.yml`) that declares the stack. A repository that holds several stacks therefore gets a changelog per stack instead of everything that happened in the repository. Where the stack resolves to no path inside the repository, or covers the repository root, all commits of the range are listed.
+Only commits that changed a file of the stack are listed, like `git log -- <paths>`. The paths are the ones the compose project resolves to: the compose files, local files read through `include:` (with the `env_file:` of an include entry) or `extends: file:`, `configs:`, `secrets:`, `env_file:`, bind mount sources and build contexts, plus the deploy config file (`.doco-cd.yml` or `.doco-cd.<target>.yml`) that declares the stack. A repository that holds several stacks therefore gets a changelog per stack instead of everything that happened in the repository. Where the stack resolves to no path inside the repository, or covers the repository root, all commits of the range are listed.
 
 The deploy config counts as a whole file, so a commit that changes one document of it is listed by every stack of that file that deploys afterwards.
 
@@ -182,8 +182,8 @@ Merged branches are handled like `git log` does: the commits of a merged pull re
 
 A few changes cannot be attributed to a stack and are therefore not listed:
 
-- Files pulled in with `include:` or `extends: file:`, because Compose resolves them away and the loaded project no longer names them.
-- Services of a profile that is not active, their files do not belong to the deployed stack.
+- Remote includes (Git or OCI), which live outside the repository.
+- Services of a profile that is not active, their files do not belong to the deployed stack. A file such a service extends with `extends: file:` is the exception: Compose reads it to load the project, so its commits are listed.
 - Stacks that live in a Git submodule, a submodule bump only changes the submodule path in the parent repository.
 
 A build context matches everything below it, so a second stack placed inside the build context of another one shows up in both changelogs.

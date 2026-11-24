@@ -646,8 +646,8 @@ secrets:
 			},
 			workingDir:   "stacks/a",
 			composeFiles: []string{"stacks/a/compose.yaml"},
-			want:         []string{},
-			note:         "GAP: compose-go does not keep the included files in types.Project, so the include is invisible to the filter",
+			want:         []string{"change included file"},
+			note:         "compose-go does not keep the included files in types.Project, composeFileRefs reads them from the raw compose files",
 		},
 		{
 			name: "extends from another file",
@@ -667,8 +667,8 @@ secrets:
 			},
 			workingDir:   "stacks/a",
 			composeFiles: []string{"stacks/a/compose.yaml"},
-			want:         []string{},
-			note:         "GAP: compose-go resolves extends away, the extended file is not kept in types.Project",
+			want:         []string{"change extended file"},
+			note:         "compose-go does not keep the extended file in types.Project, composeFileRefs reads it from the raw compose files",
 		},
 		{
 			name: "service behind an inactive profile",

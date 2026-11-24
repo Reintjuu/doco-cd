@@ -150,11 +150,9 @@ func serviceFiles(p *types.Project) ([]projectFile, error) {
 }
 
 // resolvedProjectFiles returns the full file set of a compose project: the compose files,
+// the local files reached through `include:` and `extends: file:` (see composeFileRefs),
 // everything serviceFiles resolves and the build contexts. A change has to touch one of
 // these paths to affect the stack.
-//
-// Files reached through `include:` or `extends: file:` are missing: compose-go resolves
-// both away and types.Project does not name them any more.
 func resolvedProjectFiles(p *types.Project) ([]projectFile, error) {
 	deployFiles, err := serviceFiles(p)
 	if err != nil {
@@ -169,6 +167,10 @@ func resolvedProjectFiles(p *types.Project) ([]projectFile, error) {
 
 	for _, composeFile := range p.ComposeFiles {
 		files.add(p, composeFile, false)
+	}
+
+	for _, ref := range composeFileRefs(p) {
+		files.add(p, ref, false)
 	}
 
 	for _, s := range p.Services {
